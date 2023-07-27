@@ -68,7 +68,7 @@ app.use('/$', (req, res) => {
 });
 
 app.use('/api/v1', require('./routes/auth.routes'));
-app.use('/api/v1', require('./routes/user.routes'));
+app.use('/api/v1', require('./routes/owner.routes'));
 
 // 404 page
 app.all('*', (req, res) => {
