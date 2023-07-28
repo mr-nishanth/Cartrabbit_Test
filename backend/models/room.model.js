@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const roomSchema = new mongoose.Schema(
     {
-        owner: {
+        ownerId: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'User',
             required: true,
@@ -18,7 +18,7 @@ const roomSchema = new mongoose.Schema(
             min: [1, 'At least one bed is required.'],
         },
         photos: {
-            type: [String],
+            type: String,
             required: [true, 'At least one photo is required.'],
         },
         minStay: {
@@ -35,10 +35,9 @@ const roomSchema = new mongoose.Schema(
             required: [true, 'Rent per day is required.'],
             min: [0, 'Rent per day cannot be negative.'],
         },
-
-        bookingExpiryIn: {
-            type: Date,
-            default: null,
+        bookingId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Booking',
         },
     },
     { timestamps: true }
