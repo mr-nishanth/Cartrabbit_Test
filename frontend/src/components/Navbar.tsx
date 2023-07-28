@@ -27,7 +27,16 @@ export function Navbar() {
                 </Link>
                 <div className='hidden space-x-2 lg:block'>
                     {isAuthenticated ? (
-                        <div className='flex space-x-2 items-center'>
+                        <div className='flex items-center  space-x-2'>
+                            <Link
+                                to={'/dashboard'}
+                                className='rounded-md border border-black px-3 py-2 text-sm font-semibold text-black shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black'
+                            >
+                                Dashboard
+                            </Link>
+                            <h2 className='text-blue-600'>
+                                {user?.name?.toUpperCase()}
+                            </h2>
                             <button
                                 type='button'
                                 className='rounded-md border border-black px-3 py-2 text-sm font-semibold text-black shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black'
@@ -35,9 +44,6 @@ export function Navbar() {
                             >
                                 Logout
                             </button>
-                            <h2 className='text-blue-600'>
-                                {user?.name?.toUpperCase()}
-                            </h2>
                         </div>
                     ) : (
                         <>
