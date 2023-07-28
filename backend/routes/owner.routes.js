@@ -4,18 +4,40 @@ const {
     getSpecificRoom,
     updateSpecificRoom,
     deleteSpecificRoom,
+    getAllRoomsByOwnerId,
 } = require('../controllers/owner.controller');
-const { isAuthenticatedUser } = require('../middleware/authenticate');
+const {
+    isAuthenticatedUser,
+    authorizeRoles,
+} = require('../middleware/authenticate');
+const { upload } = require('../utils/multer');
 
 const router = require('express').Router();
 
-router.route('/rooms').get([isAuthenticatedUser, getAllRooms]);
-router.route('/rooms').post([isAuthenticatedUser, createRooms]);
+router
+    .route('/rooms/customer')
+    .get([isAuthenticatedUser, authorizeRoles('customer'), getAllRooms]);
+
+router
+    .route('/rooms')
+    .get([isAuthenticatedUser, authorizeRoles('owner'), getAllRoomsByOwnerId]);
+router
+    .route('/rooms')
+    .post([
+        isAuthenticatedUser,
+        authorizeRoles('owner'),
+        upload.single('image'),
+        createRooms,
+    ]);
 
 router
     .route('/rooms/:id')
-    .get([isAuthenticatedUser, getSpecificRoom])
-    .put([isAuthenticatedUser, updateSpecificRoom])
-    .delete([isAuthenticatedUser, deleteSpecificRoom]);
+    .get([
+        isAuthenticatedUser,
+        authorizeRoles('owner', 'customer'),
+        getSpecificRoom,
+    ])
+    .put([isAuthenticatedUser, authorizeRoles('owner'), updateSpecificRoom])
+    .delete([isAuthenticatedUser, authorizeRoles('owner'), deleteSpecificRoom]);
 
 module.exports = router;
