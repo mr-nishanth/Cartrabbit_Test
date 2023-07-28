@@ -5,6 +5,7 @@ const {
     registerUser,
     loginUser,
     logoutUser,
+    getMyProfile,
 } = require('../controllers/auth.controllers');
 const { isAuthenticatedUser } = require('../middleware/authenticate');
 
@@ -18,5 +19,6 @@ const limiter = rateLimit({
 router.route('/register').post(registerUser);
 router.route('/login').post([limiter, loginUser]);
 router.route('/logout').get([isAuthenticatedUser, logoutUser]);
-
+// USER ROUTES
+router.route('/myprofile').get([isAuthenticatedUser, getMyProfile]);
 module.exports = router;
