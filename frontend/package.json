@@ -1,5 +1,5 @@
 {
-    "name": "health-zone-ts-frontend",
+    "name": "home-zone-ts-frontend",
     "private": true,
     "version": "0.0.0",
     "type": "module",
@@ -13,12 +13,15 @@
         "@hookform/resolvers": "^3.1.1",
         "axios": "^1.4.0",
         "clsx": "^2.0.0",
+        "date-fns": "^2.30.0",
+        "dayjs": "^1.11.9",
         "lucide-react": "^0.263.0",
         "react": "^18.2.0",
         "react-dom": "^18.2.0",
         "react-hook-form": "^7.45.2",
         "react-hot-toast": "^2.4.1",
         "react-router-dom": "^6.14.2",
+        "react-tailwindcss-datepicker": "^1.6.5",
         "yup": "^1.2.0",
         "zod": "^3.21.4",
         "zustand": "^4.3.9"

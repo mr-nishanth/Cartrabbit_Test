@@ -2,24 +2,33 @@ const User = require('../models/user.model');
 const catchAsyncErrors = require('../middleware/catchAsyncErrors');
 const ErrorHandler = require('../utils/errorHandler');
 const sendToken = require('../utils/jwt');
+const registerSchema = require('../joi_schema/registerSchema');
+const loginSchema = require('../joi_schema/loginSchema');
 
 /**
  * @description Register a new user
- * @path {/api/v1/register} req
+ * @path {/api/v1/register}
  */
 
 exports.registerUser = catchAsyncErrors(async (req, res, next) => {
     console.log('Register User', req.body);
-    const { name, email, password, mobile, role } = req.body;
 
-    let user = await User.findOne({ email }).exec();
+    const { error, value } = registerSchema.validate(req.body);
 
+    if (error) {
+        const validationErrors = error.details.map((err) =>
+            err.message.replace(/"/g, '')
+        );
+        return res
+            .status(400)
+            .json({ success: false, message: `${validationErrors} [Joi]` });
+    }
+
+    let user = await User.findOne({ email: value.email }).exec();
     if (user) {
         return next(new ErrorHandler('Email already Exists', 400));
     }
-
-    user = await User.create({ name, email, password, mobile, role });
-
+    user = await User.create(value);
     return res.status(201).json({
         message: 'User Registration Successful',
         success: true,
@@ -29,47 +38,37 @@ exports.registerUser = catchAsyncErrors(async (req, res, next) => {
 
 /**
  * @description Login a user
- * @param {/api/v1/login} req
- * @param {*} res
- * @param {*} next
+ * @path {/api/v1/login}
+ 
  */
 exports.loginUser = catchAsyncErrors(async (req, res, next) => {
     console.log('LoginUser', req.body);
-    const { email, password } = req.body;
-    if (!email || !password) {
-        return next(new ErrorHandler('Please enter email & password', 400));
-    }
+    const { error, value } = loginSchema.validate(req.body);
+    console.log({ value });
 
-    //   check if user exists in the database by email address and return error if it does not exist in the database
+    if (error) {
+        const validationErrors = error.details.map((err) =>
+            err.message.replace(/"/g, '')
+        );
+        return res
+            .status(400)
+            .json({ success: false, message: `${validationErrors} [Joi]` });
+    }
+    const { email, password } = value;
     const user = await User.findOne({ email }).select('+password').exec();
 
-    if (!user) {
-        return next(new ErrorHandler('Invalid email or password', 401));
+    if (user && (await user.isValidatePassword(password))) {
+        sendToken({ userObj: user, statusCode: 200, response: res });
+        return;
     }
 
-    //   check if password is correct or not
-    if (!(await user.isValidatePassword(password))) {
-        return next(new ErrorHandler('Invalid email or password', 401));
-    }
-
-    sendToken({ userObj: user, statusCode: 200, response: res });
+    return next(new ErrorHandler('Invalid email or password', 401));
 });
 /**
  * @description Logout a user
- * @param {/api/v1/logout} req
- * @param {*} res
- * @param {*} next
+ * @path {/api/v1/logout}
  */
 exports.logoutUser = (req, res, next) => {
-    /**
-     * TODO - Implement logout functionality
-     * 1. Clear cookie
-     * 2. Clear session
-     * 3. Clear local storage
-     * 4. Redirect to login page
-     * 5. Show success message
-     */
-    // * Check if user is logged in
     return res
         .status(200)
         .cookie('token', null, {
@@ -81,3 +80,21 @@ exports.logoutUser = (req, res, next) => {
             message: 'Logged out',
         });
 };
+
+/**
+ * @description Get currently logged in user details
+ * @param {/api/v1/myprofile}
+ *  @method {GET}
+ * @access private
+ */
+
+exports.getMyProfile = catchAsyncErrors(async (req, res, next) => {
+    const user = await User.findById(req.user.id).exec();
+    if (user) {
+        return res.status(200).json({
+            success: true,
+            user,
+        });
+    }
+    return next(new ErrorHandler('User not found', 404));
+});

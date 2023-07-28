@@ -3,37 +3,31 @@ const catchAsyncErrors = require('./catchAsyncErrors');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user.model');
 exports.isAuthenticatedUser = catchAsyncErrors(async (req, res, next) => {
-    // console.log(req.cookies)
-    // get token from cookies
     const { token } = req.cookies;
 
-    if (!token) {
-        return next(
-            new ErrorHandler('Login first to access this resource', 401)
-        );
+    if (token) {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        req.user = await User.findById(decoded.id).exec();
+        next();
+        return;
     }
 
-    //  verify token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = await User.findById(decoded.id).exec();
-    next();
+    return next(new ErrorHandler('Login first to access this resource', 401));
 });
 
 exports.authorizeRoles = (...roles) => {
     return (req, res, next) => {
-        // req.user is set in isAuthenticatedUser middleware above this middleware function
-        // console.log(req.user);
-        // console.log(roles);
-        // if user role is not in roles array, then return error message
-        if (!roles.includes(req.user.role)) {
-            return next(
-                new ErrorHandler(
-                    `Role (${req.user.role}) is not allowed to access this resource`,
-                    403
-                )
-            );
+        if (roles.includes(req.user.role)) {
+            // if role is allowed, then go to next middleware
+            next();
+            return;
         }
-        // if role is allowed, then go to next middleware
-        next();
+
+        return next(
+            new ErrorHandler(
+                `Role (${req.user.role}) is not allowed to access this resource`,
+                403
+            )
+        );
     };
 };

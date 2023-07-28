@@ -3,6 +3,7 @@ interface SignUp {
     email: string;
     mobile: string;
     password: string;
+    role: string;
 }
 
 interface LogIn {
@@ -36,10 +37,34 @@ interface Response {
     user: User;
     token?: string;
     users?: User[];
+    room?: Room;
+    rooms?: Room[];
 }
 
-interface EditProfile {
-    name: string | undefined;
-    email: string | undefined;
-    mobile: string | undefined;
+interface RoomStore {
+    rooms: Room[] | null;
+}
+
+interface Room {
+    _id: string;
+    ownerId: {
+        _id: string;
+        name: string;
+    };
+    name: string;
+    numBeds: number;
+    photos: string;
+    minStay: number;
+    maxStay: number;
+    rentPerDay: number;
+    image?: string;
+}
+
+interface AddRoom {
+    name: string;
+    numBeds: string | null;
+    minStay: string | null;
+    maxStay: string | null;
+    rentPerDay: string | null;
+    image?: string;
 }

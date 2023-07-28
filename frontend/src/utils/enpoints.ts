@@ -3,9 +3,12 @@ interface Endpoints {
     login: string;
     logout: string;
     getProfile: string;
-    updateProfile: string;
-    getAllUser: string;
+
+    rooms: string;
+    roomsForCustomer: string;
     deleteUser: string;
+
+    bookings: string;
 }
 
 const endpoints: Endpoints = {
@@ -13,9 +16,11 @@ const endpoints: Endpoints = {
     login: '/api/v1/login',
     logout: '/api/v1/logout',
     getProfile: '/api/v1/myprofile',
-    updateProfile: '/api/v1/update',
-    getAllUser: '/api/v1/admin/users',
+
     deleteUser: '/api/v1/admin/user',
+    rooms: '/api/v1/rooms',
+    roomsForCustomer: '/api/v1/rooms/customer',
+    bookings: '/api/v1/bookings',
 };
 
 export default endpoints;

@@ -1,6 +1,11 @@
 import { ArrowRight } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useForm, FieldValues, SubmitHandler } from 'react-hook-form';
+import {
+    useForm,
+    FieldValues,
+    SubmitHandler,
+    Controller,
+} from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'react-hot-toast';
 import useAuthStore from '../store/useAuthStore';
@@ -13,6 +18,7 @@ const initialValue: SignUp = {
     email: '',
     mobile: '',
     password: '',
+    role: '',
 };
 
 const inputTypes: InputTypes[] = [
@@ -43,6 +49,7 @@ const SignUp = () => {
 
     const {
         register,
+        control,
         handleSubmit,
         formState: { errors, isLoading },
     } = useForm<FieldValues>({
@@ -62,10 +69,10 @@ const SignUp = () => {
     console.log({ user });
 
     const onSubmit: SubmitHandler<FieldValues> = async (data) => {
-        const { name, password, email, mobile } = data;
+        const { name, password, email, mobile, role } = data;
         toast.loading('Registering User ⌛', { id: '1' });
 
-        const result = await registerUser(name, password, email, mobile);
+        const result = await registerUser(name, password, email, mobile, role);
 
         // console.log({ REGISTER: result });
         console.log({ isAuthenticated });
@@ -77,7 +84,7 @@ const SignUp = () => {
             navigate('/login');
         } else {
             let message;
-            if (!result.message) {
+            if (!result?.message) {
                 message = result;
             } else {
                 message =
@@ -107,7 +114,7 @@ const SignUp = () => {
                 </p>
                 <form
                     onSubmit={handleSubmit(onSubmit)}
-                    className='mt-8'
+                    className='mt-2'
                 >
                     <div className='space-y-5'>
                         {inputTypes?.map((input) => (
@@ -122,6 +129,33 @@ const SignUp = () => {
                             />
                         ))}
 
+                        <div>
+                            <label className='text-base font-medium text-gray-900'>
+                                Role
+                            </label>
+                            <Controller
+                                name='role'
+                                control={control}
+                                defaultValue=''
+                                render={({ field }) => (
+                                    <select
+                                        {...field}
+                                        className='mt-1 flex h-10 w-full rounded-md border border-gray-300 bg-transparent px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-gray-400 focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50'
+                                    >
+                                        <option value=''>Select a role</option>
+                                        <option value='owner'>Owner</option>
+                                        <option value='customer'>
+                                            Customer
+                                        </option>
+                                    </select>
+                                )}
+                            />
+                            {errors.role && (
+                                <span className='text-red-400 text-sm leading-6'>
+                                    Role Either Customer or Owner
+                                </span>
+                            )}
+                        </div>
                         <button
                             type='submit'
                             className='inline-flex w-full items-center justify-center rounded-md bg-black px-3.5 py-2.5 font-semibold leading-7 text-white hover:bg-black/80'

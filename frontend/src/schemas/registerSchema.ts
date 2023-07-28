@@ -20,6 +20,9 @@ const registerSchema = z.object({
         .min(6, { message: 'Password must be at least 6 characters long' })
         .max(50, { message: 'Password must not exceed 50 characters' })
         .nonempty({ message: 'Password is required' }),
+    role: z.enum(['owner', 'customer']).refine((val) => !!val, {
+        message: 'Please select a role (owner or customer).',
+    }),
 });
 
 export default registerSchema;
