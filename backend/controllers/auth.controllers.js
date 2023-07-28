@@ -80,3 +80,21 @@ exports.logoutUser = (req, res, next) => {
             message: 'Logged out',
         });
 };
+
+/**
+ * @description Get currently logged in user details
+ * @param {/api/v1/myprofile}
+ *  @method {GET}
+ * @access private
+ */
+
+exports.getMyProfile = catchAsyncErrors(async (req, res, next) => {
+    const user = await User.findById(req.user.id).exec();
+    if (user) {
+        return res.status(200).json({
+            success: true,
+            user,
+        });
+    }
+    return next(new ErrorHandler('User not found', 404));
+});
