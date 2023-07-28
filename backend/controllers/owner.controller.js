@@ -1,11 +1,12 @@
-const User = require('../models/user.model');
-const Room = require('../models/room.model');
+const fs = require('fs');
 
+const Room = require('../models/room.model');
 const catchAsyncErrors = require('../middleware/catchAsyncErrors');
 const ErrorHandler = require('../utils/errorHandler');
 const roomSchema = require('../joi_schema/roomSchema');
 const isValidObjectId = require('../utils/isValidObjectId');
 const updateRoomSchema = require('../joi_schema/updateRoomSchema');
+const cloudinary = require('../utils/cloudinary');
 
 /**
  * @description Get all rooms
@@ -15,10 +16,31 @@ const updateRoomSchema = require('../joi_schema/updateRoomSchema');
  */
 
 exports.getAllRooms = catchAsyncErrors(async (req, res, next) => {
-    const rooms = await Room.find().populate('owner', 'name').exec();
+    const rooms = await Room.find().populate('ownerId', 'name').exec();
     if (rooms) {
         return res.status(200).json({
             message: 'All Rooms',
+            success: true,
+            roomsCount: rooms.length,
+            rooms,
+        });
+    }
+    return next(new ErrorHandler('No rooms found', 404));
+});
+
+/**
+ * @description Get all rooms by ownerId
+ * @path {/api/v1/rooms}
+ * @method {GET}
+ * @access private
+ */
+
+exports.getAllRoomsByOwnerId = catchAsyncErrors(async (req, res, next) => {
+    const ownerId = req.user._id;
+    const rooms = await Room.find({ ownerId }).exec();
+    if (rooms) {
+        return res.status(200).json({
+            message: 'All Rooms By Owner Id',
             success: true,
             roomsCount: rooms.length,
             rooms,
@@ -34,6 +56,15 @@ exports.getAllRooms = catchAsyncErrors(async (req, res, next) => {
  * @access private
  */
 exports.createRooms = catchAsyncErrors(async (req, res, next) => {
+    console.log({ 'Create Rooms': req.body });
+    console.log({ File: req.file });
+    let cloudinaryResult;
+    if (req.file) {
+        cloudinaryResult = await cloudinary.uploader.upload(req.file.path);
+
+        // Delete the local file after successful Cloudinary upload
+        fs.unlinkSync(req.file.path);
+    }
     const { error, value } = roomSchema.validate(req.body);
 
     if (error) {
@@ -49,9 +80,11 @@ exports.createRooms = catchAsyncErrors(async (req, res, next) => {
     if (room) {
         return next(new ErrorHandler('Room already Exists', 400));
     }
+    console.log({ cloudinaryResult });
     room = await Room.create({
         ...value,
-        owner: req.user._id,
+        ownerId: req.user._id,
+        photos: cloudinaryResult.secure_url,
     });
     if (room) {
         return res.status(201).json({
@@ -77,8 +110,9 @@ exports.getSpecificRoom = catchAsyncErrors(async (req, res, next) => {
     }
 
     const room = await Room.findById(req.params.id)
-        .populate('owner', 'name')
+        .populate(['ownerId.name', 'bookingId.startDate', 'bookingId.endDate'])
         .exec();
+
     if (room) {
         return res.status(200).json({
             message: 'Room',
@@ -103,7 +137,6 @@ exports.updateSpecificRoom = catchAsyncErrors(async (req, res, next) => {
     }
 
     const { error, value } = updateRoomSchema.validate(req.body);
-    console.log({ value });
 
     if (error) {
         const validationErrors = error.details.map((err) =>
