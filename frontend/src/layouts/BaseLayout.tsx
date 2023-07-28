@@ -7,9 +7,10 @@ type Props = {
 
 const BaseLayout: React.FC<Props> = ({ children }) => {
     return (
-        <div className='flex flex-col justify-between'>
+        // <div className='flex flex-col justify-between'>
+        <div className='h-screen'>
             <Navbar />
-            <main className='flex flex-1 justify-center items-center'>
+            <main className=' flex flex-1 justify-center items-center'>
                 {children}
             </main>
             <Toaster />
