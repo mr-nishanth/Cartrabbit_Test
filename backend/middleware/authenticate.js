@@ -14,3 +14,20 @@ exports.isAuthenticatedUser = catchAsyncErrors(async (req, res, next) => {
 
     return next(new ErrorHandler('Login first to access this resource', 401));
 });
+
+exports.authorizeRoles = (...roles) => {
+    return (req, res, next) => {
+        if (roles.includes(req.user.role)) {
+            // if role is allowed, then go to next middleware
+            next();
+            return;
+        }
+
+        return next(
+            new ErrorHandler(
+                `Role (${req.user.role}) is not allowed to access this resource`,
+                403
+            )
+        );
+    };
+};
