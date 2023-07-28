@@ -12,8 +12,8 @@ const app = express();
 const helmet = require('helmet');
 const cookieParser = require('cookie-parser');
 // setup body parser
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '20mb' }));
 
 // Cookie parser middleware
 app.use(cookieParser());
@@ -69,6 +69,7 @@ app.use('/$', (req, res) => {
 
 app.use('/api/v1', require('./routes/auth.routes'));
 app.use('/api/v1', require('./routes/owner.routes'));
+app.use('/api/v1', require('./routes/booking.routes'));
 
 // 404 page
 app.all('*', (req, res) => {
