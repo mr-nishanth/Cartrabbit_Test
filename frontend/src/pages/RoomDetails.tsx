@@ -88,6 +88,7 @@ const RoomDetailsPage = () => {
         console.log({ isChecked });
         setIsChecked(!isChecked);
         setSingleDate(!singleDate);
+        setValue({ startDate: null, endDate: null });
     };
 
     return (
