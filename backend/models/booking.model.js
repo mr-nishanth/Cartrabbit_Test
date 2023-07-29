@@ -14,26 +14,27 @@ const bookingSchema = new mongoose.Schema(
         startDate: {
             type: Date,
             required: [true, 'Start date is required.'],
+            validate: {
+                validator: function (value) {
+                    // Custom validation function to ensure the selected date is today or in the future
+                    return value >= new Date().setHours(0, 0, 0, 0); // Set time to midnight for date comparison only
+                },
+                message: 'Start date cannot be in the past.',
+            },
         },
         endDate: {
             type: Date,
             required: [true, 'End date is required.'],
+            validate: {
+                validator: function (value) {
+                    return value >= new Date().setHours(0, 0, 0, 0);
+                },
+                message: 'End date cannot be in the past.',
+            },
         },
     },
     { timestamps: true }
 );
-
-// Define a middleware function to update the bookingExpiresIn field in the corresponding Room Model
-bookingSchema.post('save', async function () {
-    // Get the Room document using the roomId
-    const Room = mongoose.model('Room');
-    const room = await Room.findById(this.roomId);
-
-    if (room) {
-        room.bookingExpiresIn = this._id;
-        await room.save();
-    }
-});
 
 const Booking = mongoose.model('Booking', bookingSchema);
 module.exports = Booking;
