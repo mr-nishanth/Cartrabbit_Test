@@ -1,12 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import DatePicker from 'react-tailwindcss-datepicker';
-import { addDays, format, formatISO } from 'date-fns';
+import { useState, useEffect } from 'react';
+import { addDays, format, formatISO, startOfDay } from 'date-fns';
 import { useNavigate, useParams } from 'react-router-dom';
 import useRoomStore from '../store/useRoomStore';
 import { shallow } from 'zustand/shallow';
-import { ro } from 'date-fns/locale';
 import Datepicker from 'react-tailwindcss-datepicker';
 import { toast } from 'react-hot-toast';
+import disableBookedDate from '../utils/disableBookedDate';
 
 const RoomDetailsPage = () => {
     const navigate = useNavigate();
@@ -35,14 +34,14 @@ const RoomDetailsPage = () => {
         getRoomData();
     }, [getRoomById, id]);
 
-    // Replace these values with your backend data
-    const minStay = roomDetails?.minStay;
-    const maxStay = roomDetails?.maxStay;
-
+    const minStay = roomDetails?.minStay; // Minimum stay duration in days (e.g., 1)
+    const maxStay = roomDetails?.maxStay; // Maximum stay duration in days (e.g., 10)
     // Calculate min and max dates based on today's date
-    const today = new Date();
+    const today = startOfDay(new Date()); // Set time to midnight (00:00:00)
     const minDate = today;
-    const maxDate = addDays(today, maxStay!);
+    const maxDate = addDays(today, maxStay! - 1);
+    console.log('Minimum Stay Date:', minDate);
+    console.log('Maximum Stay Date:', maxDate);
 
     const handleValueChange = (newValue: any) => {
         console.log('newValue:', newValue);
@@ -50,6 +49,11 @@ const RoomDetailsPage = () => {
     };
 
     const handleBookNow = async () => {
+        if (!value.startDate || !value.endDate) {
+            toast.error('Please select the date first', { id: '2' });
+            return;
+        }
+
         toast.loading('Booking Room  ⌛', { id: '1' });
 
         const result = await roomBooing(id!, value.startDate!, value.endDate!);
@@ -74,6 +78,18 @@ const RoomDetailsPage = () => {
         }
     };
 
+    const bookedDate = disableBookedDate(roomDetails?.bookingId);
+    console.log({ bookedDate });
+
+    const [isChecked, setIsChecked] = useState(false);
+    const [singleDate, setSingleDate] = useState(false);
+
+    const handleToggle = () => {
+        console.log({ isChecked });
+        setIsChecked(!isChecked);
+        setSingleDate(!singleDate);
+    };
+
     return (
         <div className='flex flex-wrap w-11/12 p-14 shadow-lg m-14 rounded-md'>
             {/* Left side - Room Image */}
@@ -87,9 +103,20 @@ const RoomDetailsPage = () => {
 
             {/* Right side - Room Details */}
             <div className='w-full md:w-1/2 p-4'>
+                <label className='flex items-center space-x-2 m-2'>
+                    <input
+                        type='checkbox'
+                        className='form-checkbox w-6 h-6'
+                        checked={isChecked}
+                        onChange={handleToggle}
+                    />
+                    <span className='mr-2 text-sm'>One Day</span>
+                </label>
                 {/* Room Availability Calendar */}
                 <div className='mb-4'>
                     <Datepicker
+                        asSingle={singleDate}
+                        disabledDates={bookedDate}
                         showFooter={true}
                         startFrom={minDate}
                         value={value}
