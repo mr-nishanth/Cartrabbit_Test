@@ -58,6 +58,10 @@ interface Room {
     maxStay: number;
     rentPerDay: number;
     image?: string;
+    bookingId?: {
+        startDate: Date | undefined;
+        endDate: Date | undefined;
+    };
 }
 
 interface AddRoom {
