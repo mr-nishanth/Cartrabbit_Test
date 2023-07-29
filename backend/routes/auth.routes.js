@@ -16,7 +16,7 @@ const limiter = rateLimit({
 });
 
 // AUTH ROUTES
-router.route('/register').post(registerUser);
+router.route('/register').post([limiter, registerUser]);
 router.route('/login').post([limiter, loginUser]);
 router.route('/logout').get([isAuthenticatedUser, logoutUser]);
 // USER ROUTES
