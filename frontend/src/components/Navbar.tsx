@@ -3,6 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import useAuthStore from '../store/useAuthStore';
 import useRoomStore from '../store/useRoomStore';
 import { shallow } from 'zustand/shallow';
+import { debounce } from 'lodash';
+import { useCallback } from 'react';
 export function Navbar() {
     const navigate = useNavigate();
     const [isAuthenticated, logout, user] = useAuthStore(
@@ -13,6 +15,16 @@ export function Navbar() {
         (state) => [state.searchString, state.setSearchString],
         shallow
     );
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    const startSearch = useCallback(
+        debounce((text: string) => setSearchString(text), 500),
+        []
+    );
+    const handleSearch = (text: string) => {
+        startSearch(text);
+    };
+
     const handleLogout = () => {
         logout();
         return navigate('/login');
@@ -36,9 +48,8 @@ export function Navbar() {
                                     type='text'
                                     placeholder='Browse Room'
                                     className='flex-1 outline-none p-1 ring-black '
-                                    value={searchString}
                                     onChange={(e) =>
-                                        setSearchString(e.target.value)
+                                        handleSearch(e.target.value)
                                     }
                                 />
                                 <button
