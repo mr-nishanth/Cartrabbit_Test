@@ -16,7 +16,10 @@ const cloudinary = require('../utils/cloudinary');
  */
 
 exports.getAllRooms = catchAsyncErrors(async (req, res, next) => {
-    const rooms = await Room.find().populate('ownerId', 'name').exec();
+    const rooms = await Room.find()
+        .populate('ownerId', 'name')
+        .populate('bookingId', 'startDate endDate customerId')
+        .exec();
     if (rooms) {
         return res.status(200).json({
             message: 'All Rooms',
@@ -37,7 +40,10 @@ exports.getAllRooms = catchAsyncErrors(async (req, res, next) => {
 
 exports.getAllRoomsByOwnerId = catchAsyncErrors(async (req, res, next) => {
     const ownerId = req.user._id;
-    const rooms = await Room.find({ ownerId }).exec();
+    const rooms = await Room.find({ ownerId })
+        .populate('ownerId', 'name')
+        .populate('bookingId', 'startDate endDate customerId')
+        .exec();
     if (rooms) {
         return res.status(200).json({
             message: 'All Rooms By Owner Id',
@@ -56,8 +62,6 @@ exports.getAllRoomsByOwnerId = catchAsyncErrors(async (req, res, next) => {
  * @access private
  */
 exports.createRooms = catchAsyncErrors(async (req, res, next) => {
-    console.log({ 'Create Rooms': req.body });
-    console.log({ File: req.file });
     let cloudinaryResult;
     if (req.file) {
         cloudinaryResult = await cloudinary.uploader.upload(req.file.path);
@@ -110,7 +114,8 @@ exports.getSpecificRoom = catchAsyncErrors(async (req, res, next) => {
     }
 
     const room = await Room.findById(req.params.id)
-        .populate(['ownerId.name', 'bookingId.startDate', 'bookingId.endDate'])
+        .populate('ownerId', 'name')
+        .populate('bookingId', 'startDate endDate customerId')
         .exec();
 
     if (room) {

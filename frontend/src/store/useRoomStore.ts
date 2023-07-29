@@ -4,10 +4,11 @@ import endpoints from '../utils/enpoints';
 
 const initialState: RoomStore = {
     rooms: null,
-    room: null,
+    searchString: '',
 };
 
 interface RoomAction {
+    setSearchString: (searchString: string) => void;
     getAllRooms: () => Promise<Response>;
     getAllRoomsForCustomer: () => Promise<Response>;
     addRooms: (
@@ -190,6 +191,8 @@ const useRoomStore = create<RoomStore & RoomAction>()((set, get) => ({
             return error?.response?.data;
         }
     },
+
+    setSearchString: (searchString) => set({ searchString }),
 }));
 
 export default useRoomStore;

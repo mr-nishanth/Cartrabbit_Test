@@ -43,6 +43,7 @@ interface Response {
 
 interface RoomStore {
     rooms: Room[] | null;
+    searchString: string;
 }
 
 interface Room {
@@ -58,6 +59,10 @@ interface Room {
     maxStay: number;
     rentPerDay: number;
     image?: string;
+    bookingId?: {
+        startDate: Date | undefined;
+        endDate: Date | undefined;
+    };
 }
 
 interface AddRoom {

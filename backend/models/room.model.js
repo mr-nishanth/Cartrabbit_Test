@@ -35,10 +35,12 @@ const roomSchema = new mongoose.Schema(
             required: [true, 'Rent per day is required.'],
             min: [0, 'Rent per day cannot be negative.'],
         },
-        bookingId: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'Booking',
-        },
+        bookingId: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'Booking',
+            },
+        ],
     },
     { timestamps: true }
 );
