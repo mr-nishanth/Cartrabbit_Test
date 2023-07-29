@@ -43,6 +43,7 @@ interface Response {
 
 interface RoomStore {
     rooms: Room[] | null;
+    searchString: string;
 }
 
 interface Room {
