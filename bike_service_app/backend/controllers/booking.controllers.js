@@ -53,7 +53,9 @@ exports.createBookings = catchAsyncErrors(async (req, res, next) => {
     }
 
     // Check if the user is present in the database
-    let user = await User.findById(customerId).select('name').exec();
+    let user = await User.findById(customerId)
+        .select('name mobile email')
+        .exec();
 
     // Check if the user has already booked the same service on the same day
     const existingBooking = await Booking.findOne({
@@ -75,11 +77,26 @@ exports.createBookings = catchAsyncErrors(async (req, res, next) => {
 
     // TODO:
     // Send Email to Owner ✅
-    const message = `Service name : ${
-        service?.name
-    } \n Booked Date : ${new Date(date).toDateString()} \n Customer name : ${
-        user?.name
-    }`;
+    const message = `
+        <div style="max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ccc; border-radius: 5px; font-family: Arial, sans-serif; line-height: 1.6;">
+        <h1 style="margin-bottom: 10px; font-size: 24px;">Service name : ${
+            service?.name
+        }</h1>
+        <h2 style="margin-bottom: 10px; font-size: 20px;">Booked Date : ${new Date(
+            date
+        ).toDateString()}</h2>
+        <h3 style="margin-bottom: 10px; font-size: 18px;">Customer name : ${
+            user?.name
+        }</h3>
+        <h3 style="margin-bottom: 10px; font-size: 18px;">Customer Mobile Number : ${
+            user?.mobile
+        }</h3>
+        <h3 style="margin-bottom: 10px; font-size: 18px;">Customer Email : ${
+            user?.email
+        }</h3>
+    </div>
+        `;
+
     if (booking) {
         try {
             await sendEmail({
@@ -166,11 +183,17 @@ exports.updateBookingStatus = catchAsyncErrors(async (req, res, next) => {
         // TODO:
         // Send Email to Customer  ✅
         if (booking.status === 'ReadyForDelivery') {
-            const message = `Service name : ${
-                booking?.service?.name
-            } \n Booked Date : ${new Date(
-                booking?.date
-            ).toDateString()} \n Status : Ready for Delivery`;
+            const message = `
+        <div style="max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ccc; border-radius: 5px; font-family: Arial, sans-serif; line-height: 1.6;">
+        <h1 style="margin-bottom: 10px; font-size: 24px;">Service name : ${
+            booking?.service?.name
+        }</h1>
+        <h2 style="margin-bottom: 10px; font-size: 20px;">Booked Date : ${new Date(
+            booking?.date
+        ).toDateString()}</h2>        
+        <h3 style="margin-bottom: 10px; font-size: 18px;">Status : <span style="color:green">Ready for Delivery</span></h3>
+    </div>
+        `;
 
             try {
                 sendEmail({
@@ -213,7 +236,7 @@ exports.getAllBookingByOwnerID = catchAsyncErrors(async (req, res, next) => {
                 match: { ownerId: ownerId },
                 select: 'name ownerId',
             })
-            .populate('customer', 'name email')
+            .populate('customer', 'name email mobile')
             .exec();
 
         const filteredBookings = bookings.filter(
