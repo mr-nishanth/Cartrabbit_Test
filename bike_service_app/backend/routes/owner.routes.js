@@ -30,11 +30,12 @@ router
     ]);
 
 router
-    .route('/services/owner/:id')
-    .get([isAuthenticatedUser, authorizeRoles('owner'), getSpecificService]);
-
-router
     .route('/services/:id')
+    .get([
+        isAuthenticatedUser,
+        authorizeRoles('owner', 'customer'),
+        getSpecificService,
+    ])
     .patch([
         isAuthenticatedUser,
         authorizeRoles('owner'),

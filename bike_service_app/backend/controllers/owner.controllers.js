@@ -87,7 +87,7 @@ exports.getAllServiceByOwnerID = catchAsyncErrors(async (req, res, next) => {
 
 /**
  * @description Get a service
- * @path {/api/v1/service/owner/:id}
+ * @path {/api/v1/service/:id}
  * @method {GET}
  * @access private
  */
