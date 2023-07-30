@@ -63,12 +63,14 @@ exports.getAllRoomsByOwnerId = catchAsyncErrors(async (req, res, next) => {
  */
 exports.createRooms = catchAsyncErrors(async (req, res, next) => {
     let cloudinaryResult;
-    if (req.file) {
-        cloudinaryResult = await cloudinary.uploader.upload(req.file.path);
 
-        // Delete the local file after successful Cloudinary upload
-        fs.unlinkSync(req.file.path);
+    if (!req.file) {
+        return next(new ErrorHandler('Please upload a file', 400));
     }
+    cloudinaryResult = await cloudinary.uploader.upload(req.file.path);
+
+    // Delete the local file after successful Cloudinary upload
+    fs.unlinkSync(req.file.path);
     const { error, value } = roomSchema.validate(req.body);
 
     if (error) {
