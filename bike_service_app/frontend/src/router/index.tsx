@@ -92,14 +92,13 @@ export const router = createBrowserRouter([
         errorElement: <ErrorPage />,
     },
     {
-        path: '/dashboard/room-details/:id',
-        id: 'room-details',
+        path: '/dashboard/service-details/:id',
+        id: 'service-details/',
         element: (
             <Suspense fallback={<div>Loading...</div>}>
                 <BaseLayout>
                     {/* <ProtectedRoute> */}
                     <ServiceDetails />
-                    import Bookings from '../pages/Bookings';
                     {/* </ProtectedRoute> */}
                 </BaseLayout>
             </Suspense>

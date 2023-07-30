@@ -58,7 +58,7 @@ const useServiceStore = create<ServiceStore & ServiceAction>()((set, get) => ({
             console.log({ GET_ALL_SERVICES_RESPONSE: data });
             if (data.success) {
                 set({
-                    services: data?.service,
+                    services: data?.services,
                 });
                 return data;
             }

@@ -6,7 +6,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 
 import useAuthStore from '../store/useAuthStore';
 import { shallow } from 'zustand/shallow';
-import useRoomStore from '../store/useServiceStore';
+import useServiceStore from '../store/useServiceStore';
 import { useEffect } from 'react';
 import editServiceSchema from '../schemas/editServiceSchema';
 
@@ -32,7 +32,7 @@ const EditService = () => {
     const { id } = useParams();
 
     const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
-    const [updateService, getServiceById] = useRoomStore(
+    const [updateService, getServiceById] = useServiceStore(
         (state) => [state.updateService, state.getServiceById],
         shallow
     );

@@ -65,7 +65,6 @@ interface ServiceStore {
 
 interface BookingStore {
     bookings: Booking[] | null;
-    searchString: string;
 }
 
 interface Service {
