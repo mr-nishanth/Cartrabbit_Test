@@ -3,6 +3,7 @@ const {
     createBookings,
     updateBookingStatus,
     getAllBookingByOwnerID,
+    getAllBookingByCustomerID,
 } = require('../controllers/booking.controllers');
 const {
     isAuthenticatedUser,
@@ -21,6 +22,14 @@ router
         isAuthenticatedUser,
         authorizeRoles('owner'),
         getAllBookingByOwnerID,
+    ]);
+
+router
+    .route('/bookings/customer')
+    .get([
+        isAuthenticatedUser,
+        authorizeRoles('customer'),
+        getAllBookingByCustomerID,
     ]);
 
 router

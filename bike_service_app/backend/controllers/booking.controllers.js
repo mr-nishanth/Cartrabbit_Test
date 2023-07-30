@@ -14,7 +14,7 @@ const sendEmail = require('../utils/sendMail');
 
 exports.getAllBookings = catchAsyncErrors(async (req, res, next) => {
     const bookings = await Booking.find()
-        .populate('customer', 'name email')
+        .populate('customer', 'name email mobile')
         .exec();
     if (bookings) {
         return res.status(200).json({
@@ -135,7 +135,7 @@ exports.updateBookingStatus = catchAsyncErrors(async (req, res, next) => {
 
     // Check if the booking is present in the database
     let booking = await Booking.findById(bookingId)
-        .populate('customer', 'name email')
+        .populate('customer', 'name email mobile')
         .populate('service', 'name')
         .exec();
     console.log({ booking });
@@ -204,6 +204,7 @@ exports.updateBookingStatus = catchAsyncErrors(async (req, res, next) => {
                 return res.status(200).json({
                     success: true,
                     message: `Email sent to customer email: ${booking?.customer?.email} `,
+                    booking,
                 });
             } catch (error) {
                 return next(new ErrorHandler(error.message, 500));
@@ -260,4 +261,32 @@ exports.getAllBookingByOwnerID = catchAsyncErrors(async (req, res, next) => {
             message: 'Error fetching bookings for the specified ownerId.',
         });
     }
+});
+
+/**
+ * @description Get all bookings by customerID
+ * @path {/api/v1/bookings/customer}
+ * @method {GET}
+ * @access private
+ */
+
+exports.getAllBookingByCustomerID = catchAsyncErrors(async (req, res, next) => {
+    const customerId = req.user._id;
+
+    // Fetch all bookings associated with the ownerId
+    const bookings = await Booking.find({ customer: customerId })
+        .populate('customer', 'name email mobile')
+        .populate('service', 'name description price ownerId')
+        .exec();
+
+    if (!bookings) {
+        return next(new ErrorHandler('No Bookings found', 404));
+    }
+
+    return res.status(200).json({
+        success: true,
+        customerId,
+        bookingsCount: bookings.length,
+        bookings,
+    });
 });
