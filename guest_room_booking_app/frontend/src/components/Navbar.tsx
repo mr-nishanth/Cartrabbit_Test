@@ -43,22 +43,26 @@ export function Navbar() {
                 <div className='hidden space-x-2 lg:block'>
                     {isAuthenticated ? (
                         <div className='flex items-center  space-x-2'>
-                            <form className='flex items-center space-x-6 bg-white rounded-md p-2 shadow-md w-64  md:flex-initial '>
-                                <input
-                                    type='text'
-                                    placeholder='Browse Room'
-                                    className='flex-1 outline-none p-1 ring-black '
-                                    onChange={(e) =>
-                                        handleSearch(e.target.value)
-                                    }
-                                />
-                                <button
-                                    type='submit'
-                                    hidden
-                                >
-                                    Search
-                                </button>
-                            </form>
+                            {user?.role === 'customer' && (
+                                <>
+                                    <form className='flex items-center space-x-6 bg-white rounded-md p-2 shadow-md w-64  md:flex-initial '>
+                                        <input
+                                            type='text'
+                                            placeholder='Browse Room'
+                                            className='flex-1 outline-none p-1 ring-black '
+                                            onChange={(e) =>
+                                                handleSearch(e.target.value)
+                                            }
+                                        />
+                                        <button
+                                            type='submit'
+                                            hidden
+                                        >
+                                            Search
+                                        </button>
+                                    </form>
+                                </>
+                            )}
                             <Link
                                 to={'/dashboard'}
                                 className='rounded-md border border-black px-3 py-2 text-sm font-semibold text-black shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black'
