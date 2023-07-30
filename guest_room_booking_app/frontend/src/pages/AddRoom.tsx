@@ -72,11 +72,12 @@ const AddRoom = () => {
         }
         console.log({ data });
         const { name, numBeds, minStay, maxStay, rentPerDay } = data;
-        toast.loading('Adding Room details ⌛', { id: '1' });
         if (!selectedImage) {
             console.error('Please select an image.');
+            toast.error('Please select an image.', { id: '2' });
             return;
         }
+        toast.loading('Adding Room details ⌛', { id: '1' });
         const result = await addRooms(
             name,
             numBeds,
