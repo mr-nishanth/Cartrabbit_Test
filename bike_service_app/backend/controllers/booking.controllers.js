@@ -4,7 +4,7 @@ const User = require('../models/user.model');
 const catchAsyncErrors = require('../middleware/catchAsyncErrors');
 const ErrorHandler = require('../utils/errorHandler');
 const isValidObjectId = require('../utils/isValidObjectId');
-
+const sendEmail = require('../utils/sendMail');
 /**
  * @description Get all bookings
  * @path {/api/v1/bookings}
@@ -38,15 +38,16 @@ exports.createBookings = catchAsyncErrors(async (req, res, next) => {
     const serviceId = req.body?.serviceId;
     const customerId = req.user._id;
     const { date } = req.body;
+
     const validId = isValidObjectId(serviceId);
     if (!validId) {
         return next(new ErrorHandler('Invalid Service Id', 400));
     }
+
     // Check if the service is present in the database
     let service = await Service.findById(serviceId)
         .populate('ownerId', 'name email')
         .exec();
-    console.log({ service });
     if (!service) {
         return next(new ErrorHandler('Service not found', 404));
     }
@@ -60,7 +61,6 @@ exports.createBookings = catchAsyncErrors(async (req, res, next) => {
         service: serviceId,
         date,
     }).exec();
-
     if (existingBooking) {
         return next(
             new ErrorHandler('You have already booked this service', 400)
@@ -74,17 +74,28 @@ exports.createBookings = catchAsyncErrors(async (req, res, next) => {
     });
 
     // TODO:
-    // If the user booking the same service on same day more then one time ,sent the service already booked today by your self
-    // Send Email to Owner email
-    const message = `Service name : ${service?.name} \n Booked Date : ${date} \n Customer name : ${user?.name}`;
+    // Send Email to Owner ✅
+    const message = `Service name : ${
+        service?.name
+    } \n Booked Date : ${new Date(date).toDateString()} \n Customer name : ${
+        user?.name
+    }`;
     if (booking) {
-        return res.status(201).json({
-            message: `${service.name} booked successfully`,
-            success: true,
-            booking,
-            email: service?.ownerId?.email,
-            emailMessage: message,
-        });
+        try {
+            await sendEmail({
+                email: service?.ownerId?.email,
+                subject: 'Bike Service Status',
+                message,
+            });
+            return res.status(200).json({
+                success: true,
+                ownerMessage: `Email sent to Owner Email: ${service?.ownerId?.email}`,
+                message: `${service.name} booked successfully`,
+                booking,
+            });
+        } catch (error) {
+            return next(new ErrorHandler(error.message, 500));
+        }
     }
     return next(new ErrorHandler('Service booking Failed', 400));
 });
@@ -110,7 +121,6 @@ exports.updateBookingStatus = catchAsyncErrors(async (req, res, next) => {
         .populate('customer', 'name email')
         .populate('service', 'name')
         .exec();
-
     console.log({ booking });
     if (!booking) {
         return next(new ErrorHandler('Booking not found', 404));
@@ -152,27 +162,33 @@ exports.updateBookingStatus = catchAsyncErrors(async (req, res, next) => {
     booking.status = status;
     booking = await booking.save();
 
-    // TODO:
-    // Send Email to Customer email
-    const message = `Service name : ${
-        booking?.service?.name
-    } \n Booked Date : ${new Date(
-        booking?.date
-    ).toDateString()} \n Status : Ready for Delivery`;
-
     if (booking) {
-        // Send Email to Customer email
+        // TODO:
+        // Send Email to Customer  ✅
         if (booking.status === 'ReadyForDelivery') {
-            return res.status(201).json({
-                success: true,
-                booking,
-                email: booking?.customer?.email,
-                emailMessage: message,
-            });
+            const message = `Service name : ${
+                booking?.service?.name
+            } \n Booked Date : ${new Date(
+                booking?.date
+            ).toDateString()} \n Status : Ready for Delivery`;
+
+            try {
+                sendEmail({
+                    email: booking?.customer?.email,
+                    subject: 'Bike Service Status',
+                    message,
+                });
+                return res.status(200).json({
+                    success: true,
+                    message: `Email sent to customer email: ${booking?.customer?.email} `,
+                });
+            } catch (error) {
+                return next(new ErrorHandler(error.message, 500));
+            }
         }
 
         return res.status(201).json({
-            message: `Status Completed`,
+            message: `Services Status set to Completed`,
             success: true,
             booking,
         });
