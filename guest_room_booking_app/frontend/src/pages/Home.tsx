@@ -45,10 +45,11 @@ const Home = () => {
                         Health Zone
                     </h1>
                     <p className='mt-6 text-lg leading-8 text-gray-600'>
-                        Eat a Balanced Diet: Focus on consuming a variety of
-                        fruits, vegetables, whole grains, lean proteins, and
-                        healthy fats. Avoid excessive intake of processed foods,
-                        sugary drinks, and high-fat foods.
+                        Home is where love resides, memories are created, and
+                        laughter never ends. It's a place of comfort, warmth,
+                        and a sanctuary from the outside world. No matter where
+                        we go, home is the anchor that brings us back to the
+                        ones we cherish most.
                     </p>
                     <div className='mt-10 flex items-center justify-center gap-x-2'>
                         <button
