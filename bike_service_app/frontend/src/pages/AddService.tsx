@@ -18,7 +18,7 @@ const initialValue: AddService = {
 const inputTypes: InputTypes[] = [
     {
         id: 'name',
-        label: 'Room Name',
+        label: 'Service Name',
         type: 'text',
     },
     {
@@ -83,8 +83,8 @@ const AddService = () => {
     };
 
     return (
-        <div className='h-[83vh] flex items-center justify-center bg-white px-4 py-10 sm:px-6 sm:py-16 lg:px-8'>
-            <div className='bg-slate-100 px-4 py-8 shadow-xl sm:rounded-lg sm:px-10 xl:mx-auto xl:w-full xl:max-w-sm 2xl:max-w-md'>
+        <div className='h-[83vh] w-full flex items-center justify-center bg-white px-4 py-10 sm:px-6 sm:py-16 lg:px-8'>
+            <div className='bg-slate-100 w-full px-4 py-8 shadow-xl sm:rounded-lg sm:px-10 xl:mx-auto xl:w-full xl:max-w-sm 2xl:max-w-md'>
                 <h2 className='text-2xl font-bold leading-tight text-black'>
                     Add Service Details
                 </h2>
