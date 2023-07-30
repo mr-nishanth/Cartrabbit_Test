@@ -14,17 +14,17 @@ const Owner = () => {
         getAllServicesForOwner();
     }, [getAllServicesForOwner]);
 
-    const handleAddRoom = () => {
+    const handleAddService = () => {
         navigate('/dashboard/add');
     };
     return (
         <div className='w-full flex items-center justify-around flex-wrap space-x-3 space-y-3'>
             <div className='flex bg-slate-600 w-full p-3'>
                 <button
-                    onClick={handleAddRoom}
+                    onClick={handleAddService}
                     className='px-2 py-1 bg-green-500 text-white rounded'
                 >
-                    Add Room
+                    Add Service
                 </button>
             </div>
             {services?.length ? (
