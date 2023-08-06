@@ -8,4 +8,4 @@
 
 - [ ] Wait list application ❌
 - [ ] Micro credit application ❌
-- [ ] Todo application 
+- [ ] Todo application ❌
