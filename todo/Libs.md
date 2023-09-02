@@ -8,3 +8,4 @@
 - [ ] react-hot-toast
 - [ ] tailwind
 - [ ] lucide-react
+- [ ] shadcn ui
